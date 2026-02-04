@@ -67,7 +67,7 @@
             
             React.useEffect(() => {
                 loadData();
-                const interval = setInterval(loadData, 10000);
+                const interval = setInterval(loadData, 5000); // 5초마다 갱신
                 return () => clearInterval(interval);
             }, []);
 
@@ -84,7 +84,8 @@
                         delete window[callbackName];
                     };
                     
-                    script.src = `${GOOGLE_SCRIPT_URL}?callback=${callbackName}`;
+                    // 캐시 방지를 위한 타임스탬프 추가
+                    script.src = `${GOOGLE_SCRIPT_URL}?callback=${callbackName}&_=${Date.now()}`;
                     document.body.appendChild(script);
                 } catch (error) {
                     console.error('데이터 로드 실패:', error);
@@ -106,6 +107,12 @@
             const [submitSuccess, setSubmitSuccess] = useState(false);
 
             const handleAdditionalCourseToggle = (courseId) => {
+                // 1순위 신청과정과 중복 체크
+                if (formData.courseId === courseId) {
+                    alert('이미 1순위 신청과정으로 선택하신 과정입니다.');
+                    return;
+                }
+
                 const current = formData.additionalCourses;
                 if (current.includes(courseId)) {
                     setFormData({
@@ -136,7 +143,34 @@
                     return;
                 }
 
-                // 캐시된 데이터로 먼저 체크
+                // 1순위 과정과 추가 과정 중복 체크
+                if (formData.additionalCourses.includes(formData.courseId)) {
+                    alert('1순위 신청과정과 추가 신청과정에 동일한 과정이 선택되었습니다.\n추가 신청과정에서 해당 과정을 제외해주세요.');
+                    return;
+                }
+
+                // 최신 데이터로 다시 확인 (동시 신청 대비)
+                setLoading(true);
+                
+                await new Promise(resolve => {
+                    const callbackName = 'refreshCallback' + Date.now();
+                    const script = document.createElement('script');
+                    
+                    window[callbackName] = (data) => {
+                        if (data.registrations) {
+                            setRegistrations(data.registrations);
+                        }
+                        document.body.removeChild(script);
+                        delete window[callbackName];
+                        resolve();
+                    };
+                    
+                    // 캐시 방지를 위한 타임스탬프 추가
+                    script.src = `${GOOGLE_SCRIPT_URL}?callback=${callbackName}&_=${Date.now()}`;
+                    document.body.appendChild(script);
+                });
+
+                // 최신 데이터로 체크
                 const isDuplicate = registrations.some(reg => 
                     reg.name === formData.name && 
                     reg.email === formData.email
@@ -144,6 +178,7 @@
 
                 if (isDuplicate) {
                     alert('이미 수강신청을 완료하셨습니다.\n과정 변경이 필요하시면 Learning&Value 팀으로 문의해주세요.');
+                    setLoading(false);
                     return;
                 }
 
@@ -152,10 +187,9 @@
                 
                 if (currentCount >= course.capacity) {
                     alert('죄송합니다. 해당 과정은 정원이 마감되었습니다.');
+                    setLoading(false);
                     return;
                 }
-
-                setLoading(true);
                 const additionalCourseNames = formData.additionalCourses
                     .map(id => courses.find(c => c.id === parseInt(id))?.name)
                     .filter(Boolean)
