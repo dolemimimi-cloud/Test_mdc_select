@@ -331,18 +331,24 @@
             return (
                 <div className="min-h-screen bg-gray-50">
                     <div className="max-w-6xl mx-auto p-6">
-                        <div className="bg-gradient-to-r from-slate-700 to-slate-800 text-white p-6 rounded-lg mb-6">
+                        <a 
+                            href="https://krafton.atlassian.net/wiki/x/38soG" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="block bg-gradient-to-r from-slate-700 to-slate-800 text-white p-6 rounded-lg mb-6 hover:from-slate-600 hover:to-slate-700 transition-colors cursor-pointer"
+                        >
                             <h1 className="text-3xl font-bold flex items-center gap-3">
                                 <BookOpen />
                                 [선택] MDC 선택과정 수강신청
                             </h1>
-                            <p className="mt-2 text-slate-200">과정 별 일정을 확인하시어 신청해 주세요</p>
+                            <p className="mt-2 text-slate-200">과정 별 일정을 확인하시어 신청해 주세요.</p>
                             <div className="mt-3 text-sm text-slate-300 space-y-1">
-                                <p>* 최대 30명 정원으로 정원이 초과되면 신청이 마감됩니다</p>
+                                <p>* 최대 4명 정원으로 정원이 초과되면 신청이 마감됩니다.</p>
                                 <p>* (1순위 신청 과정)은 필수 선택, (추가 신청 과정)은 0~2개 과정까지 신청 가능합니다.</p>
-                                <p>* 수강과정 변경 시 Learning&Value 팀으로 문의 바랍니다</p>
+                                <p>* 수강과정 변경 시 Learning&Value 팀으로 문의 바랍니다.</p>
+                                <p>* 클릭 시 MDC 과정 안내 wiki 페이지로 이동합니다.</p>
                             </div>
-                        </div>
+                        </a>
 
                         {submitSuccess && (
                             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setSubmitSuccess(false)}>
