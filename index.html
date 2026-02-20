@@ -235,6 +235,9 @@
                 const daysInMonthMap = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
                 const monthStartDays = [3, 6, 6, 2, 4, 0, 2, 5, 1, 3, 6, 1];
                 
+                // 2026년 공휴일 (10월, 11월)
+                const holidays = ['2026-10-03', '2026-10-09']; // 개천절, 한글날
+                
                 const daysInMonth = daysInMonthMap[currentMonth];
                 const startDay = monthStartDays[currentMonth];
                 const year = 2026;
@@ -251,6 +254,11 @@
                 const getCourseForDate = (day) => {
                     const dateStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
                     return courses.find(c => c.date === dateStr);
+                };
+
+                const isHoliday = (day) => {
+                    const dateStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                    return holidays.includes(dateStr);
                 };
 
                 const getColorClasses = (color) => {
@@ -290,8 +298,8 @@
                             </button>
                         </div>
                         <div className="grid grid-cols-7 gap-1">
-                            {['일', '월', '화', '수', '목', '금', '토'].map(day => (
-                                <div key={day} className="text-center font-semibold text-xs p-1 bg-gray-50">
+                            {['일', '월', '화', '수', '목', '금', '토'].map((day, idx) => (
+                                <div key={day} className={`text-center font-semibold text-xs p-1 bg-gray-50 ${idx === 0 ? 'text-red-600' : idx === 6 ? 'text-blue-600' : ''}`}>
                                     {day}
                                 </div>
                             ))}
@@ -299,6 +307,12 @@
                                 const course = day ? getCourseForDate(day) : null;
                                 const count = course ? getRegistrationCount(course.id) : 0;
                                 const isFull = count >= 4;
+                                const dayOfWeek = day ? (startDay + day - 1) % 7 : null;
+                                const isSunday = dayOfWeek === 0;
+                                const isSaturday = dayOfWeek === 6;
+                                const isHolidayDate = day ? isHoliday(day) : false;
+                                const isRedDay = isSunday || isHolidayDate;
+                                
                                 return (
                                     <div
                                         key={idx}
@@ -308,7 +322,7 @@
                                     >
                                         {day && (
                                             <>
-                                                <div className="text-xs font-semibold mb-1">{day}</div>
+                                                <div className={`text-xs font-semibold mb-1 ${isRedDay ? 'text-red-600' : isSaturday ? 'text-blue-600' : ''}`}>{day}</div>
                                                 {course && (
                                                     <div className={`text-xs p-1 rounded ${isFull ? 'bg-red-100 text-red-700' : getColorClasses(course.color)}`}>
                                                         <div className="font-medium truncate text-xs" title={course.name}>{course.name}</div>
