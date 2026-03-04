@@ -91,7 +91,14 @@
 
             const getRegistrationCount = (courseId) => {
                 const course = courses.find(c => c.id === courseId);
-                return registrations.filter(reg => reg.course === course.name).length;
+                return registrations.filter(reg => {
+                    // "과정1, 과정2" 형태로 저장된 경우도 처리
+                    if (reg.course && reg.course.includes(',')) {
+                        const courseList = reg.course.split(',').map(c => c.trim());
+                        return courseList.includes(course.name);
+                    }
+                    return reg.course === course.name;
+                }).length;
             };
 
             const [formData, setFormData] = useState({
