@@ -104,13 +104,30 @@
             const [submitSuccess, setSubmitSuccess] = useState(false);
 
             const handleCourseToggle = (courseId) => {
+                const course = courses.find(c => c.id === parseInt(courseId));
                 const current = formData.selectedCourses;
+                
                 if (current.includes(courseId)) {
+                    // 선택 해제
                     setFormData({
                         ...formData,
                         selectedCourses: current.filter(id => id !== courseId)
                     });
                 } else {
+                    // 같은 과정의 다른 차수가 이미 선택되어 있는지 확인
+                    const courseName = course.name.replace(/\s*\d+차수/, ''); // "피드백 스킬" 추출
+                    
+                    const hasSameCourse = current.some(selectedId => {
+                        const selectedCourse = courses.find(c => c.id === parseInt(selectedId));
+                        const selectedCourseName = selectedCourse.name.replace(/\s*\d+차수/, '');
+                        return courseName === selectedCourseName;
+                    });
+                    
+                    if (hasSameCourse) {
+                        alert(`이미 "${courseName}" 과정의 다른 차수를 선택하셨습니다.\n같은 과정의 여러 차수를 동시에 선택할 수 없습니다.`);
+                        return;
+                    }
+                    
                     setFormData({
                         ...formData,
                         selectedCourses: [...current, courseId]
