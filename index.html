@@ -531,7 +531,10 @@
                                                                 type="checkbox"
                                                                 value={course.id}
                                                                 checked={isSelected}
-                                                                onChange={() => !isFull && handleCourseToggle(course.id.toString())}
+                                                                onChange={() => {
+                                                                    if (isFull) return;
+                                                                    handleCourseToggle(course.id.toString());
+                                                                }}
                                                                 disabled={isFull}
                                                                 className="w-4 h-4"
                                                             />
