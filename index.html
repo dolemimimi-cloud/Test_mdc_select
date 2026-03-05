@@ -148,8 +148,9 @@
                     return;
                 }
 
-                if (formData.selectedCourses.length === 0) {
-                    alert('\'과정 및 차수 선택\'에서 1개 이상의 과정을 선택해주세요.\n(대기 신청과정은 과정 취소 인원이 없을 시 입과가 어려우실 수 있습니다)');
+                // '과정 및 차수 선택' 또는 '대기 신청' 중 하나는 필수
+                if (formData.selectedCourses.length === 0 && !formData.waitlistCourse) {
+                    alert('\'과정 및 차수 선택\' 또는 \'대기 신청\' 중 최소 1개는 선택해주세요.');
                     return;
                 }
 
@@ -502,9 +503,8 @@
                                     <div>
                                         <label className="block mb-1">
                                             <span className="text-xl font-semibold text-gray-900">과정 및 차수 선택</span>
-                                            <span className="text-red-500"> *</span>
                                         </label>
-                                        <p className="text-base text-gray-600 mb-3">학습 정원이 정해져 있으므로 반드시 수강하실 수 있는 과정만 선택해주세요 (최소 1개 필수, 복수 선택 가능)</p>
+                                        <p className="text-base text-gray-600 mb-3">학습 정원이 정해져 있으므로 반드시 수강하실 수 있는 과정만 선택해주세요 (복수 선택 가능)</p>
                                         <div className="space-y-2">
                                             {courses.map(course => {
                                                 const count = getRegistrationCount(course.id);
